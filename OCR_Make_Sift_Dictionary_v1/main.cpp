@@ -22,25 +22,28 @@ int main(int argc, char** argv) {
     string labels[CLASScount] = {"A", "B", "C", "D", "E", "F", "G",
     "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
+    //the number of words
+    int dictionarySize = 300;
+    string toSaveDictionary = "dictionary04.yml";
     string filenameTemplates[CLASScount] = {
-        "TrainingDir\\Letters\\A\\A%03d.jpg", //%.03d is like printf
-        "TrainingDir\\Letters\\B\\B%03d.jpg",
-        "TrainingDir\\Letters\\C\\C%03d.jpg",
-        "TrainingDir\\Letters\\D\\D%03d.jpg",
-        "TrainingDir\\Letters\\E\\E%03d.jpg",
-        "TrainingDir\\Letters\\F\\F%03d.jpg",
-        "TrainingDir\\Letters\\G\\G%03d.jpg",
-        "TrainingDir\\Nums\\1\\1%03d.jpg",
-        "TrainingDir\\Nums\\2\\2%03d.jpg",
-        "TrainingDir\\Nums\\3\\3%03d.jpg",
-        "TrainingDir\\Nums\\4\\4%03d.jpg",
-        "TrainingDir\\Nums\\5\\5%03d.jpg",
-        "TrainingDir\\Nums\\6\\6%03d.jpg",
-        "TrainingDir\\Nums\\7\\7%03d.jpg",
-        "TrainingDir\\Nums\\8\\8%03d.jpg",
-        "TrainingDir\\Nums\\9\\9%03d.jpg"
+        "TemplateDir\\Letters\\A\\A%03d.jpg", //%.03d is like printf
+        "TemplateDir\\Letters\\B\\B%03d.jpg",
+        "TemplateDir\\Letters\\C\\C%03d.jpg",
+        "TemplateDir\\Letters\\D\\D%03d.jpg",
+        "TemplateDir\\Letters\\E\\E%03d.jpg",
+        "TemplateDir\\Letters\\F\\F%03d.jpg",
+        "TemplateDir\\Letters\\G\\G%03d.jpg",
+        "TemplateDir\\Nums\\1\\1%03d.jpg",
+        "TemplateDir\\Nums\\2\\2%03d.jpg",
+        "TemplateDir\\Nums\\3\\3%03d.jpg",
+        "TemplateDir\\Nums\\4\\4%03d.jpg",
+        "TemplateDir\\Nums\\5\\5%03d.jpg",
+        "TemplateDir\\Nums\\6\\6%03d.jpg",
+        "TemplateDir\\Nums\\7\\7%03d.jpg",
+        "TemplateDir\\Nums\\8\\8%03d.jpg",
+        "TemplateDir\\Nums\\9\\9%03d.jpg"
     };
-    int fileCounts = 70;
+    int fileCounts = 1;
     //int fileCounts[] = {50, 50, 50, 50, 50};  //using 40 training images
 
     char *filename = new char[100];
@@ -58,8 +61,10 @@ int main(int argc, char** argv) {
             sprintf(filename, filenameTemplates[classification].c_str(), imageNumber);
             cout << "file name = "  << filename << endl;
             currentImage = imread(filename, CV_LOAD_IMAGE_GRAYSCALE); //Load as grayscale                
+            cout << "image loaded" << endl;
             //detect feature points
             detector.detect(currentImage, keypoints);
+            cout << "keypoints detected" << endl;
             //compute the descriptors for each keypoint
             detector.compute(currentImage, keypoints, descriptor);
             features.push_back(descriptor); //place descriptors in matrix          
@@ -67,8 +72,7 @@ int main(int argc, char** argv) {
     }//for each classification
 
     //Construct BOWKMeansTrainer
-    //the number of bags
-    int dictionarySize = 150;
+
     //define Term Criteria
     TermCriteria criteriaForLooping(CV_TERMCRIT_ITER, 100, 0.001);
  
@@ -82,7 +86,7 @@ int main(int argc, char** argv) {
     cout << "BOW Clustering Started" << endl;
     Mat dictionary = bowTrainer.cluster(features);  ///this is the actual BOW method that you constructed above
     //store the vocabulary
-    FileStorage siftDictionary("dictionary02.yml", FileStorage::WRITE);  //writes the dictionary file to be used in another program
+    FileStorage siftDictionary(toSaveDictionary.c_str(), FileStorage::WRITE);  //writes the dictionary file to be used in another program
     siftDictionary << "vocabulary" << dictionary;
     siftDictionary.release();  //close the file when you are done with it
 

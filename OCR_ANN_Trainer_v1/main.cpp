@@ -20,20 +20,25 @@
 
 using namespace cv;
 using namespace std;
-#define CLASScount 16
+#define CLASScount 7
+#define TESTCLASScount 7
 
-int attributeCount = 100; //dictionary size
-int trainFileCount = 1120; //total number of training files
-int testFileCount = 35; //total number of test files
-int trainFiles = 70; //number of training files per classification
-int testFiles = 5; //number of test files per classification
+int attributeCount = 300; //dictionary size
+//int trainFiles = 2; //number of training files per classification
+//int testFiles = 2; //number of test files per classification
+int trainFileCounts = 80;    
+int testFileCounts = 20;
+int totalTrainFileCount = trainFileCounts * CLASScount; //total number of training files
+int totalTestFileCount = testFileCounts * TESTCLASScount; //total number of test files
+string dictionaryFileName = "dictionary04.yml";
+string toSaveANNFile = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn05.xml";
 
 int main(int argc, char** argv) {
-    string labels[CLASScount] = {"A", "B", "C", "D", "E", "F", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+    string labels[16] = {"A", "B", "C", "D", "E", "F", "G", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     string trainDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\TrainingDir\\";
     string testDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\TestDir\\";
-    string filenameTemplates[CLASScount] = {
+    string filenameTemplates[16] = {
         "Letters\\A\\A%03d.jpg", //%.03d is like printf
         "Letters\\B\\B%03d.jpg",
         "Letters\\C\\C%03d.jpg",
@@ -54,9 +59,7 @@ int main(int argc, char** argv) {
     
     //int fileCounts[] = {450, 526, 1074, 826, 186};
 
-    int trainFileCounts = 2;
     //int trainFileCounts[] = {180, 180, 180, 180, 180};
-    int testFileCounts = 2;
     //int testFileCounts[] = {5, 5, 5, 5, 5};
     Mat classificationResult(1, CLASScount, CV_32F);
     char *filename = new char[200];
@@ -66,14 +69,14 @@ int main(int argc, char** argv) {
     //matrix to hold the training sample
     Mat trainFeatures(0, attributeCount, CV_32F);
     //matrix to hold the labels of each taining sample
-    Mat trainResponses(trainFileCount, CLASScount, CV_32F, float(0.0));
+    Mat trainResponses(totalTrainFileCount, CLASScount, CV_32F, float(0.0));
     //matric to hold the test samples
     Mat testFeatures(0, attributeCount, CV_32F);
     //matrix to hold the test labels.
-    Mat testResponses(testFileCount, CLASScount, CV_32F, float(0.0));
+    Mat testResponses(totalTestFileCount, TESTCLASScount, CV_32F, float(0.0));
 
     Mat dictionary;
-    FileStorage dictionaryFile("dictionary01.yml", FileStorage::READ);
+    FileStorage dictionaryFile(dictionaryFileName, FileStorage::READ);
     dictionaryFile["vocabulary"] >> dictionary;
     dictionaryFile.release();
 
@@ -118,10 +121,13 @@ int main(int argc, char** argv) {
     }//for each test classification
     cout << "zaboomafoo" << endl;
     realImageNumber = -1;
-    for (int classification = 0; classification < 7; classification++) {
-        for (int imageNumber = 71; imageNumber < 71+testFileCounts; imageNumber++) {
+    for (int classification = 0; classification < TESTCLASScount; classification++) {
+        for (int imageNumber = trainFileCounts + 1; imageNumber < trainFileCounts+1+testFileCounts; imageNumber++) {
+            cout << "image number: " << imageNumber << endl;
             realImageNumber++;
-            string tempName = testDirPath + filenameTemplates[classification];
+            cout << "real image number: " << realImageNumber << endl;
+            //*****Change to testDirPath*****
+            string tempName = trainDirPath + filenameTemplates[classification];
             sprintf(filename, tempName.c_str(), imageNumber);
             cout << "file name = " << filename << endl;
             currentImage = imread(filename, CV_LOAD_IMAGE_GRAYSCALE); //Load as grayscale                
@@ -136,11 +142,12 @@ int main(int argc, char** argv) {
             bowDE.compute(currentImage, keypoints, bowDescriptor2);
             cout << "descriptors computed" << endl;
             testFeatures.push_back(bowDescriptor2); //place descriptors in matrix    
+            cout << "rows in testFeatures: " << testFeatures.rows << endl;
             testResponses.at<float>(realImageNumber, classification) = 1.0;
-            cout << filename << endl;
+            //cout << filename << endl;
 
             //debugging check that responses array is being built correctly
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < TESTCLASScount; i++)
                 printf("%1.2f ", testResponses.at<float>(realImageNumber, i));
             cout << endl;
         }//for each test image
@@ -160,14 +167,16 @@ int main(int argc, char** argv) {
     // - 10 output node, one for each class.
 
     cv::Mat layers(3, 1, CV_32S);
-    layers.at<int>(0, 0) = 300; //input layer
+    layers.at<int>(0, 0) = attributeCount; //input layer
     layers.at<int>(1, 0) = 60; //hidden layer
-    layers.at<int>(2, 0) = 5; //output layer
+    layers.at<int>(2, 0) = CLASScount; //output layer
 
+    cout << "building ann" << endl;
     //create the neural network.
     //for more details check http://docs.opencv.org/modules/ml/doc/neural_networks.html
     CvANN_MLP nnetwork(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1);
 
+    cout << "ann built" << endl;
     CvANN_MLP_TrainParams params(
 
             // terminate the training after either 1000
@@ -181,6 +190,7 @@ int main(int argc, char** argv) {
             0.1,
             0.1);
 
+    cout << "training parameters set" << endl;
     // train the neural network (using training data)
 
     printf("\nUsing training dataset\n");
@@ -188,7 +198,7 @@ int main(int argc, char** argv) {
     printf("Training iterations: %i\n\n", iterations);
 
     // Save the model generated into an xml file.
-    CvFileStorage* storage = cvOpenFileStorage("C:\\Users\\elliot\\Documents\\GitHub\\Receiving Line\\TestDir\\cvAnn01.xml", 0, CV_STORAGE_WRITE);
+    CvFileStorage* storage = cvOpenFileStorage(toSaveANNFile.c_str(), 0, CV_STORAGE_WRITE);
     nnetwork.write(storage, "ANN");
     cvReleaseFileStorage(&storage);
 
@@ -204,14 +214,12 @@ int main(int argc, char** argv) {
         {}};
 
     // for each sample in the test set.
-    for (int tsample = 0; tsample < testFileCount; tsample++) {
+    for (int tsample = 0; tsample < totalTestFileCount; tsample++) {
 
         // extract the sample
-
         test_sample = testFeatures.row(tsample);
 
         //try to predict its class
-
         nnetwork.predict(test_sample, classificationResult);
         /*The classification result matrix holds weightage  of each class.
         we take the class with the highest weightage as the resultant class */
@@ -220,7 +228,7 @@ int main(int argc, char** argv) {
         int maxIndex = 0;
         float value = 0.0f;
         float maxValue = classificationResult.at<float>(0, 0);
-        for (int index = 1; index < CLASScount; index++) {
+        for (int index = 0; index < CLASScount; index++) {
             value = classificationResult.at<float>(0, index);
             if (value > maxValue) {
                 maxValue = value;
@@ -229,7 +237,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        printf("Testing Sample %i -> class result (digit %d)\n", tsample, maxIndex);
+        printf("Testing Sample %i -> class result: %d (%s)\n", tsample, maxIndex, labels[maxIndex].c_str());
 
         //Now compare the predicted class to the actural class. if the prediction is correct then\
             //test_set_classifications[tsample][ maxIndex] should be 1.
@@ -240,7 +248,7 @@ int main(int argc, char** argv) {
             wrong_class++;
 
             //find the actual label 'class_index'
-            for (int class_index = 0; class_index < 5; class_index++) {
+            for (int class_index = 0; class_index < CLASScount; class_index++) {
                 if (testResponses.at<float>(tsample, class_index) == 1.0f) {
 
                     classification_matrix[class_index][maxIndex]++; // A class_index sample was wrongly classified as maxindex.
@@ -260,8 +268,8 @@ int main(int argc, char** argv) {
     printf("\nResults on the testing dataset\n"
             "\tCorrect classification: %d (%g%%)\n"
             "\tWrong classifications: %d (%g%%)\n",
-            correct_class, (double) correct_class * 100 / testFileCount,
-            wrong_class, (double) wrong_class * 100 / testFileCount);
+            correct_class, (double) correct_class * 100 / totalTestFileCount,
+            wrong_class, (double) wrong_class * 100 / totalTestFileCount);
     cout << "   ";
     for (int i = 0; i < CLASScount; i++) {
         cout << i << "\t";
