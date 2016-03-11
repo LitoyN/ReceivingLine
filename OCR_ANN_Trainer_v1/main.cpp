@@ -26,18 +26,18 @@ using namespace std;
 int attributeCount = 300; //dictionary size
 //int trainFiles = 2; //number of training files per classification
 //int testFiles = 2; //number of test files per classification
-int trainFileCounts = 80;    
-int testFileCounts = 20;
+int trainFileCounts = 70;    
+int testFileCounts = 30;
 int totalTrainFileCount = trainFileCounts * CLASScount; //total number of training files
 int totalTestFileCount = testFileCounts * TESTCLASScount; //total number of test files
 string dictionaryFileName = "dictionary04.yml";
-string toSaveANNFile = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn05.xml";
+string toSaveANNFile = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn08.xml";
 
 int main(int argc, char** argv) {
     string labels[16] = {"A", "B", "C", "D", "E", "F", "G", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
-    string trainDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\TrainingDir\\";
-    string testDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\TestDir\\";
+    string trainDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\Crop\\TrainingDir\\";
+    string testDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\Crop\\TestDir\\";
     string filenameTemplates[16] = {
         "Letters\\A\\A%03d.jpg", //%.03d is like printf
         "Letters\\B\\B%03d.jpg",
@@ -168,7 +168,7 @@ int main(int argc, char** argv) {
 
     cv::Mat layers(3, 1, CV_32S);
     layers.at<int>(0, 0) = attributeCount; //input layer
-    layers.at<int>(1, 0) = 60; //hidden layer
+    layers.at<int>(1, 0) = 80; //hidden layer
     layers.at<int>(2, 0) = CLASScount; //output layer
 
     cout << "building ann" << endl;
