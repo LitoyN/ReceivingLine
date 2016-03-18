@@ -24,8 +24,6 @@ using namespace std;
 #define TESTCLASScount 7
 
 int attributeCount = 300; //dictionary size
-//int trainFiles = 2; //number of training files per classification
-//int testFiles = 2; //number of test files per classification
 int trainFileCounts = 70;    
 int testFileCounts = 30;
 int totalTrainFileCount = trainFileCounts * CLASScount; //total number of training files
@@ -57,10 +55,6 @@ int main(int argc, char** argv) {
         "Nums\\9\\9%03d.jpg"
     };
     
-    //int fileCounts[] = {450, 526, 1074, 826, 186};
-
-    //int trainFileCounts[] = {180, 180, 180, 180, 180};
-    //int testFileCounts[] = {5, 5, 5, 5, 5};
     Mat classificationResult(1, CLASScount, CV_32F);
     char *filename = new char[200];
     Mat currentImage;
@@ -89,7 +83,6 @@ int main(int argc, char** argv) {
     //create Sift descriptor extractor
     Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
 
-
     //create BoF (or BoW) descriptor extractor
     BOWImgDescriptorExtractor bowDE(extractor, matcher);
     //Set the dictionary with the vocabulary we created in the first step
@@ -112,11 +105,6 @@ int main(int argc, char** argv) {
             
             trainFeatures.push_back(bowDescriptor2); //place descriptors in matrix    
             trainResponses.at<float>(realImageNumber, classification) = 1.0;
-            //cout << (classification*testFiles)+imageNumber-1 << endl;
-            //debugging check that responses array is being built correctly
-            //for(int i = 0; i < CLASScount; i++)
-            //printf("%1.2f ", responses2.at<float>((classification*testFiles)+imageNumber-1, i));
-            //cout << endl;
         }//for each test image
     }//for each test classification
     cout << "zaboomafoo" << endl;
@@ -144,7 +132,6 @@ int main(int argc, char** argv) {
             testFeatures.push_back(bowDescriptor2); //place descriptors in matrix    
             cout << "rows in testFeatures: " << testFeatures.rows << endl;
             testResponses.at<float>(realImageNumber, classification) = 1.0;
-            //cout << filename << endl;
 
             //debugging check that responses array is being built correctly
             for (int i = 0; i < TESTCLASScount; i++)
