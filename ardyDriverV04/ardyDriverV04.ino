@@ -1,13 +1,32 @@
 //From bildr article: http://bildr.org/2012/08/rotary-encoder-arduino/
 
 //these pins can not be changed 2/3 are special pins
-int encoderPin1 = 2;
-int encoderPin2 = 3;
+const int encoderPin1 = 2;
+const int encoderPin2 = 3;
+const int encoderBeltIncrement = 80;
 
 volatile int lastEncoded = 0;
 volatile long encoderValue = 0;
 
 long lastencoderValue = 0;
+
+int conveyorArray[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int arrayIndex = 0;
+int boxBin = 1;
+
+void updateConveyorArray() {
+
+  for (int i = 9; i >= 0; i--) {
+    conveyorArray[i] = conveyorArray[i - 1];
+  }
+  conveyorArray[0] = boxBin;
+  boxBin++;
+  for(int i = 0; i < 10; i++){
+    Serial.print(conveyorArray[i]);
+    Serial.print(" ");
+  }
+  Serial.println("");
+}
 
 void setup() {
   Serial.begin (9600);
@@ -44,4 +63,9 @@ void updateEncoder(){
   if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
 
   lastEncoded = encoded; //store this value for next time
+  if(encoderValue >= encoderBeltIncrement){
+    encoderValue = 0;
+    updateConveyorArray();
+  }
+  
 }

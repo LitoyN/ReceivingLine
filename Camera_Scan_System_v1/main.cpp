@@ -5,7 +5,6 @@
  * Created on March 10, 2016, 6:38 PM
  */
 
-#include <cstdlib>
 #include <iostream> //require for opening and reading files
 #include <fstream>  //required for opening and reading files
 #include <cstdlib>  //C++ std library
