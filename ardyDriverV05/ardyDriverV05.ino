@@ -8,6 +8,9 @@
 //Lessels, Jason (2011/June/06), Allen, Bruce (2009/July/23) and Gentles, Bill (2010/Nov/12)
 //http://playground.arduino.cc/Main/MaxSonar
 
+#include <AFMotor.h>
+
+//pin constants
 //serialRXPin = 0
 //serialTXPin = 1
 const int encoderPin1 = 2; //encoder pins must be 2 & 3 (interrupt pins)
@@ -23,41 +26,71 @@ const int relayPin = 10;
 //74hc595Pin = 12
 //pin 13 is on board LED but available
 
-const int yPin = 11; //used pin 11 in led serial test program. will control motor driver board for actuator
-const int rPin = 10; //used pin 10 in led serial test program. will control motor driver board for actuator
-const int gPin = 9; //used 3 led in serial test program. will only have 2 actuators. this pin not needed.
+//other constants
+const int holdBin = -1;
+const int emptyBin = 0;
 
+const int yPin = 11; 
+const int rPin = 10; 
+const int gPin = 9;
 const int brightness = 100;
+
+const int bin1 = 5; //index array of bin1 location
+const int bin2 = 8; //index array of bin2 location
+const int bin3 = 10; //index array of bin3 location
 const int encoderBeltIncrement = 80;
+const long cycleTime = 250;
 
 volatile int lastEncoded = 0;
 volatile long encoderValue = 0;
 
 long lastencoderValue = 0;
 
+//system mgmt
+int preCycleTime;
+int actualCycleTime;
+
+//conveyor mgmt
+int conveyorArraySize = 10;
 int conveyorArray[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int arrayIndex = 0;
-int boxBin = 1;
+int currentBin;
 
-int rangevalue[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//conveyor driver
+AF_DCMotor bin1Actuator(1, MOTOR12_1KHZ);
+AF_DCMotor bin2Actuator(3, MOTOR12_1KHZ);
+int actuatorSpeed = 100; //range from 0 to 255
+
+//sonar
+int sonarArraySize = 9;
+int rangevalue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 long pulse;
 int range;
+int minRange = 10;
 
+//serial
 int input;
+
 
 void setup() {
   Serial.begin (9600);
 
   pinMode(encoderPin1, INPUT); 
   pinMode(encoderPin2, INPUT);
+  pinMode(sonarPin, INPUT);
+  pinMode(relayPin, INPUT);
 
   digitalWrite(encoderPin1, HIGH); //turn pullup resistor on
   digitalWrite(encoderPin2, HIGH); //turn pullup resistor on
+  digitalWrite(relayPin, LOW);
 
   //call updateEncoder() when any high/low changed seen
   //on interrupt 0 (pin 2), or interrupt 1 (pin 3) 
   attachInterrupt(0, updateEncoder, CHANGE); 
   attachInterrupt(1, updateEncoder, CHANGE);
+
+  bin1Actuator.setSpeed(actuatorSpeed);
+  bin2Actuator.setSpeed(actuatorSpeed);
 
   digitalWrite(yPin, LOW);
   digitalWrite(rPin, LOW);
@@ -83,16 +116,34 @@ void updateEncoder(){
   
 }
 
+int readAndSort(){
+  int sortToBin = 0;
+  bool serialReceived = false;
+  Serial.print(1);
+  while(!serialReceived){
+    sortToBin = checkSerial();
+    if(sortToBin > -2){
+      serialReceived = true;
+    }
+  }
+
+  return sortToBin;
+}
+
 void sonarCheck(){
   //collect arraysize sonar measurements
-  for(int i = 0; i < ARRAYSIZE; i++){                    
-    pulse = pulseIn(SONARPIN,HIGH);
+  for(int i = 0; i < sonarArraySize; i++){                    
+    pulse = pulseIn(sonarPin,HIGH);
     rangevalue[i] = pulse/147;
     delay(10);
   }
-  sortSonar(rangevalue,ARRAYSIZE);
-  range = modeSonar(rangevalue,ARRAYSIZE);
-  
+  sortSonar(rangevalue,sonarArraySize);
+  range = modeSonar(rangevalue,sonarArraySize);
+  if(range <= minRange){
+    addToConveyorArray(holdBin);
+    currentBin = readAndSort();
+    addToConveyorArray(currentBin);
+  }
 }
 
 void sortSonar(int *a, int n){
@@ -142,13 +193,20 @@ int modeSonar(int *x,int n){
     return mode;
   }
 }
-void updateConveyorArray() {
 
-  for (int i = 9; i >= 0; i--) {
-    conveyorArray[i] = conveyorArray[i - 1];
+void addToConveyorArray(int value) {
+
+  if(value == holdBin){
+    conveyorArray[0] = value;
   }
-  conveyorArray[0] = boxBin;
-  boxBin++;
+  else{
+    for (int i = conveyorArraySize; i >= 0; i--) {
+      if(conveyorArray[i] == holdBin){
+        conveyorArray[i] = value;
+        i = 0;
+      }
+    }
+  }
   for(int i = 0; i < 10; i++){
     Serial.print(conveyorArray[i]);
     Serial.print(" ");
@@ -156,44 +214,85 @@ void updateConveyorArray() {
   Serial.println("");
 }
 
-void checkSerial(){
+void updateConveyorArray() {
+
+  for (int i = conveyorArraySize; i >= 0; i--) {
+    conveyorArray[i] = conveyorArray[i - 1];
+    if(conveyorArray[i] == i){
+      pushBox(i);
+    }
+  }
+  conveyorArray[0] = emptyBin;
+  for(int i = 0; i < 10; i++){
+    Serial.print(conveyorArray[i]);
+    Serial.print(" ");
+  }
+  Serial.println("");
+}
+
+void pushBox(int binArrayIndex){
+  switch(binArrayIndex){
+    case bin1:
+      bin1Actuator.run(FORWARD);
+      delay(250);
+      break;
+    case bin2:
+      bin2Actuator.run(FORWARD);
+      delay(250);
+      break;
+  }
+}
+
+int checkSerial(){
   if(Serial.available()>0){
     input=Serial.read();
 
   }
 
-
   switch(input){
-    case 4:
-      digitalWrite(yPin, LOW);
-      digitalWrite(rPin, LOW);
-      digitalWrite(gPin, LOW);
-      break;
     case 1:
       analogWrite(yPin, brightness);
       digitalWrite(rPin, LOW);
       digitalWrite(gPin, LOW);
+      return bin1;
       break;
     case 2:
       analogWrite(rPin, brightness);
       digitalWrite(yPin, LOW);
       digitalWrite(gPin, LOW);
+      return bin2;
       break;
     case 3:
       analogWrite(gPin, brightness);
       digitalWrite(yPin, LOW);
       digitalWrite(rPin, LOW);
+      return bin3;
+      break;
+    case 4:
+      digitalWrite(yPin, LOW);
+      digitalWrite(rPin, LOW);
+      digitalWrite(gPin, LOW);
+      break;
+    case 5:
+      digitalWrite(relayPin, LOW);
+      digitalWrite(yPin, LOW);
+      digitalWrite(rPin, LOW);
+      digitalWrite(gPin, LOW);
       break;
   }
+  return -2;
 }
 
 
 
 void loop(){ 
-  //Do stuff here
+  preCycleTime = millis();
+  sonarCheck();
+  actualCycleTime = millis() - preCycleTime;
+  if(actualCycleTime < cycleTime){
+    delay(cycleTime - actualCycleTime);
+  }
 
-  Serial.println(encoderValue);
-  delay(1000); //just here to slow down the output, and show it will work  even during a delay
 }
 
 
