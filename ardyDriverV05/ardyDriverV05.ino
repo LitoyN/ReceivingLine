@@ -16,7 +16,7 @@
 const int encoderPin1 = 2; //encoder pins must be 2 & 3 (interrupt pins)
 const int encoderPin2 = 3; //encoder pins must be 2 & 3 (interrupt pins)
 //74hc595Pin = 4
-//pin 5 is available
+const int buttonPin = 5;
 //motor3Pin = 6
 //74hc595Pin = 7
 //74hc595Pin = 8
@@ -30,13 +30,8 @@ const int relayPin = 10;
 const int holdBin = -1;
 const int emptyBin = 0;
 
-const int yPin = 11; 
-const int rPin = 10; 
-const int gPin = 9;
-const int brightness = 100;
-
 const int bin1 = 5; //index array of bin1 location
-const int bin2 = 8; //index array of bin2 location
+const int bin2 = 2; //index array of bin2 location
 const int bin3 = 10; //index array of bin3 location
 const int encoderBeltIncrement = 80;
 const long cycleTime = 250;
@@ -44,11 +39,11 @@ const long cycleTime = 250;
 volatile int lastEncoded = 0;
 volatile long encoderValue = 0;
 
-long lastencoderValue = 0;
 
 //system mgmt
 int preCycleTime;
 int actualCycleTime;
+int buttonState = 0;
 
 //conveyor mgmt
 int conveyorArraySize = 10;
@@ -71,14 +66,13 @@ int minRange = 10;
 //serial
 int input;
 
-
 void setup() {
   Serial.begin (9600);
 
   pinMode(encoderPin1, INPUT); 
   pinMode(encoderPin2, INPUT);
   pinMode(sonarPin, INPUT);
-  pinMode(relayPin, INPUT);
+  pinMode(relayPin, OUTPUT);
 
   digitalWrite(encoderPin1, HIGH); //turn pullup resistor on
   digitalWrite(encoderPin2, HIGH); //turn pullup resistor on
@@ -92,9 +86,6 @@ void setup() {
   bin1Actuator.setSpeed(actuatorSpeed);
   bin2Actuator.setSpeed(actuatorSpeed);
 
-  digitalWrite(yPin, LOW);
-  digitalWrite(rPin, LOW);
-  digitalWrite(gPin, LOW);
 
 }
 
@@ -107,7 +98,7 @@ void updateEncoder(){
 
   if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValue ++;
   if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
-
+Serial.println(encoderValue);//**********************
   lastEncoded = encoded; //store this value for next time
   if(encoderValue >= encoderBeltIncrement){
     encoderValue = 0;
@@ -141,7 +132,8 @@ void sonarCheck(){
   range = modeSonar(rangevalue,sonarArraySize);
   if(range <= minRange){
     addToConveyorArray(holdBin);
-    currentBin = readAndSort();
+    currentBin = 8;
+    //currentBin = readAndSort();
     addToConveyorArray(currentBin);
   }
 }
@@ -216,13 +208,13 @@ void addToConveyorArray(int value) {
 
 void updateConveyorArray() {
 
-  for (int i = conveyorArraySize; i >= 0; i--) {
+  for (int i = conveyorArraySize; i > 0; i--) {
     conveyorArray[i] = conveyorArray[i - 1];
     if(conveyorArray[i] == i){
       pushBox(i);
     }
   }
-  conveyorArray[0] = emptyBin;
+  conveyorArray[0] = bin2;
   for(int i = 0; i < 10; i++){
     Serial.print(conveyorArray[i]);
     Serial.print(" ");
@@ -233,13 +225,106 @@ void updateConveyorArray() {
 void pushBox(int binArrayIndex){
   switch(binArrayIndex){
     case bin1:
+    Serial.println("pushing bin1");
       bin1Actuator.run(FORWARD);
-      delay(250);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      bin1Actuator.run(BACKWARD);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      bin1Actuator.run(RELEASE);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
       break;
     case bin2:
+    Serial.println("pushing bin2");
       bin2Actuator.run(FORWARD);
-      delay(250);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      bin2Actuator.run(BACKWARD);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      bin2Actuator.run(RELEASE);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
+      delayMicroseconds(15000);
       break;
+  }
+}
+
+void loopUpdateArray(){
+  for (int i = conveyorArraySize; i > 0; i--) {
+    conveyorArray[i] = conveyorArray[i - 1];
+    if(conveyorArray[i] == i){
+      pushBox(i);
+    }
   }
 }
 
@@ -251,24 +336,24 @@ int checkSerial(){
 
   switch(input){
     case 1:
-      analogWrite(yPin, brightness);
-      digitalWrite(rPin, LOW);
-      digitalWrite(gPin, LOW);
+      //analogWrite(yPin, brightness);
+      //digitalWrite(rPin, LOW);
+      //digitalWrite(gPin, LOW);
       return bin1;
       break;
     case 2:
-      analogWrite(rPin, brightness);
-      digitalWrite(yPin, LOW);
-      digitalWrite(gPin, LOW);
+      //analogWrite(rPin, brightness);
+      //digitalWrite(yPin, LOW);
+      //digitalWrite(gPin, LOW);
       return bin2;
       break;
     case 3:
-      analogWrite(gPin, brightness);
-      digitalWrite(yPin, LOW);
-      digitalWrite(rPin, LOW);
+      //analogWrite(gPin, brightness);
+      //digitalWrite(yPin, LOW);
+      //digitalWrite(rPin, LOW);
       return bin3;
       break;
-    case 4:
+    /**case 4:
       digitalWrite(yPin, LOW);
       digitalWrite(rPin, LOW);
       digitalWrite(gPin, LOW);
@@ -278,16 +363,26 @@ int checkSerial(){
       digitalWrite(yPin, LOW);
       digitalWrite(rPin, LOW);
       digitalWrite(gPin, LOW);
-      break;
+      break;*/
   }
   return -2;
 }
 
+void checkButton(){
+  buttonState = digitalRead(buttonPin);
 
+  if(buttonState == HIGH){
+    digitalWrite(relayPin,HIGH);
+  }
+  else{
+    digitalWrite(relayPin,LOW);
+  }
+}
 
-void loop(){ 
+void loop(){
+  checkButton(); 
   preCycleTime = millis();
-  sonarCheck();
+  //sonarCheck();
   actualCycleTime = millis() - preCycleTime;
   if(actualCycleTime < cycleTime){
     delay(cycleTime - actualCycleTime);
