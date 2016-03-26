@@ -5,12 +5,22 @@ class serial{
   private:
         // private attributes
 		Tserial *com;
+		char incoming;
   public:
 
 
 	serial() {
 			
 		 }
+
+
+	char read_data()
+	{
+		incoming = com->getChar();
+		return incoming;
+		//return 'a';
+		
+	}
 	
 	bool startDevice(char *port,int speed)
 	{
@@ -44,4 +54,5 @@ class serial{
 		printf("%c",data);
 		
 	}
+
 };

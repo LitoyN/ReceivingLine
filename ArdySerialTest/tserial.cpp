@@ -33,6 +33,7 @@
 /* ---------------------------------------------------------------------- */
 #define STRICT
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <process.h>
@@ -216,7 +217,9 @@ int  Tserial::getArray         (char *buffer, int len)
     if (serial_handle!=INVALID_HANDLE_VALUE)
     {
         ReadFile(serial_handle, buffer, len, &read_nbr, NULL);
+        std::cout << "blooh "<< buffer << " blah" << std::endl;
     }
+    PurgeComm(serial_handle,PURGE_RXCLEAR);
     return((int) read_nbr);
 }
 /* -------------------------------------------------------------------- */
