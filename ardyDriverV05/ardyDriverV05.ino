@@ -285,17 +285,6 @@ int checkSerial(){
       //digitalWrite(rPin, LOW);
       return bin3;
       break;
-    /**case 4:
-      digitalWrite(yPin, LOW);
-      digitalWrite(rPin, LOW);
-      digitalWrite(gPin, LOW);
-      break;
-    case 5:
-      digitalWrite(relayPin, LOW);
-      digitalWrite(yPin, LOW);
-      digitalWrite(rPin, LOW);
-      digitalWrite(gPin, LOW);
-      break;*/
   }
   return -2;
 }

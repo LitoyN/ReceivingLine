@@ -13,9 +13,7 @@
 //pin constants
 //serialRXPin = 0
 //serialTXPin = 1
-const int encoderPin1 = 2; //encoder pins must be 2 & 3 (interrupt pins)
-const int encoderPin2 = 3; //encoder pins must be 2 & 3 (interrupt pins)
-//74hc595Pin = 4
+
 const int buttonPin = 5;
 //motor3Pin = 6
 //74hc595Pin = 7
@@ -29,27 +27,23 @@ const int relayPin = 10;
 //other constants
 const int holdBin = -1;
 const int emptyBin = 0;
-const int conveyorArraySize = 10;
 
 const int bin1 = 4; //index array of bin1 location
 const int bin2 = 7; //index array of bin2 location
 const int bin3 = 10; //index array of bin3 location
-const int encoderBeltIncrement = 20;
 const long cycleTime = 250;
 
-volatile int lastEncoded = 0;
-volatile long encoderValue = 0;
 
 
 //system mgmt
 int preCycleTime;
 int actualCycleTime;
 int buttonState = 0;
-volatile int incrementCounter = 0;
+int incrementCounter = 0;
 
 //conveyor mgmt
-//int conveyorArraySize = 10;
-int conveyorArray[] = {1, 2, 3, 4, 0, 0, 0, 0, 0, 0};
+int conveyorArraySize = 10;
+int conveyorArray[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int arrayIndex = 0;
 int currentBin;
 bool newBox = true;
@@ -69,35 +63,13 @@ int minRange = 10;
 //serial
 char input;
 
-const uint8_t LATCHSTATE = 3;
-int8_t oldState = 3;
-const int8_t KNOBDIR[] = {
-  0, -1,  1,  0,
-  1,  0,  0, -1,
- -1,  0,  0,  1,
-  0,  1, -1,  0};
-  
-int positionInternal = 0;
-int positionExternal = 0;
-int oldPositionExternal = 0;
-
-
 void setup() {
   Serial.begin (9600);
 
-  pinMode(encoderPin1, INPUT); 
-  pinMode(encoderPin2, INPUT);
   pinMode(sonarPin, INPUT);
   pinMode(relayPin, OUTPUT);
 
-  digitalWrite(encoderPin1, HIGH); //turn pullup resistor on
-  digitalWrite(encoderPin2, HIGH); //turn pullup resistor on
   digitalWrite(relayPin, LOW);
-
-  //call updateEncoder() when any high/low changed seen
-  //on interrupt 0 (pin 2), or interrupt 1 (pin 3) 
-  attachInterrupt(digitalPinToInterrupt(3), tick, CHANGE); 
-  attachInterrupt(digitalPinToInterrupt(2), tick, CHANGE);
 
   bin1Actuator.setSpeed(actuatorSpeed);
   bin2Actuator.setSpeed(actuatorSpeed);
@@ -105,38 +77,6 @@ void setup() {
 
 }
 
-void tick(){
-  int sigA = digitalRead(3);
-  int sigB = digitalRead(2);
-  int8_t thisState = sigA | (sigB << 1);
-  if (oldState != thisState) {
-    positionInternal += KNOBDIR[thisState | (oldState<<2)];
-    if (thisState == LATCHSTATE)
-      positionExternal = positionInternal >> 2;   
-    oldState = thisState;
-    if(positionExternal >= encoderBeltIncrement){
-      positionExternal = 0;
-      incrementCounter++;
-    }
-  }
-}
-
-void updateEncoder(){
-  int MSB = digitalRead(encoderPin1); //MSB = most significant bit
-  int LSB = digitalRead(encoderPin2); //LSB = least significant bit
-
-  int encoded = (MSB << 1) |LSB; //converting the 2 pin value to single number
-  int sum  = (lastEncoded << 2) | encoded; //adding it to the previous encoded value
-
-  if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValue ++;
-  if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
-  Serial.println(encoderValue);//**********************
-  lastEncoded = encoded; //store this value for next time
-  if(encoderValue >= encoderBeltIncrement){
-    encoderValue = 0;
-    incrementCounter++;
-  }
-}
 
 void sonarCheck(){
   //collect arraysize sonar measurements
@@ -149,6 +89,7 @@ void sonarCheck(){
   range = modeSonar(rangevalue,sonarArraySize);
   if(range <= minRange && newBox){
     addToConveyorArray(holdBin);
+    //currentBin = 8;
     currentBin = readAndSort();
     addToConveyorArray(currentBin);
     newBox = false;
@@ -242,7 +183,7 @@ void addToConveyorArray(int value) {
 }
 
 void updateConveyorArray() {
-Serial.println("updating array");
+
   for (int i = conveyorArraySize; i > 0; i--) {
     conveyorArray[i] = conveyorArray[i - 1];
     if(conveyorArray[i] == i){
@@ -250,17 +191,11 @@ Serial.println("updating array");
     }
   }
   conveyorArray[0] = emptyBin;
-  for(int i = 0; i < 10; i++){
+  /**for(int i = 0; i < 10; i++){
     Serial.print(conveyorArray[i]);
     Serial.print(" ");
   }
-  Serial.println("");
-}
-
-void microDelay(int x){
-  for(int i = 0; i <= x; i++){
-    delayMicroseconds(1000);
-  }
+  Serial.println("");*/
 }
 
 void pushBox(int binArrayIndex){
@@ -269,30 +204,22 @@ void pushBox(int binArrayIndex){
     case bin1:
     //Serial.println("pushing bin1");
       bin1Actuator.run(FORWARD);
-      microDelay(actuatorTime);
+      delay(actuatorTime);
       bin1Actuator.run(BACKWARD);
-      microDelay(actuatorTime);
+      delay(actuatorTime);
       bin1Actuator.run(RELEASE);
       break;
     case bin2:
     //Serial.println("pushing bin2");
       bin2Actuator.run(FORWARD);
-      microDelay(actuatorTime);
+      delay(actuatorTime);
       bin2Actuator.run(BACKWARD);
-      microDelay(actuatorTime);
+      delay(actuatorTime);
       bin2Actuator.run(RELEASE);
       break;
   }
 }
 
-void loopUpdateArray(){
-  for (int i = conveyorArraySize; i > 0; i--) {
-    conveyorArray[i] = conveyorArray[i - 1];
-    if(conveyorArray[i] == i){
-      pushBox(i);
-    }
-  }
-}
 
 int checkSerial(){
   
@@ -326,25 +253,14 @@ void checkButton(){
 }
 
 void loop(){
-  checkButton();
-  if(oldPositionExternal != positionExternal){
-    Serial.println(positionExternal);
-  }
-  oldPositionExternal = positionExternal;
-  //updateConveyorArray(); 
-  //preCycleTime = millis();
-  while(incrementCounter > 0){
-    Serial.print("incrementCounter: ");
-    Serial.println(incrementCounter);
-    updateConveyorArray();
-    incrementCounter--;
-    Serial.println(incrementCounter);
-    //sonarCheck();
-  }
-  /**actualCycleTime = millis() - preCycleTime;
+  checkButton(); 
+  preCycleTime = millis();
+  updateConveyorArray();
+  sonarCheck();
+  actualCycleTime = millis() - preCycleTime;
   if(actualCycleTime < cycleTime){
     delay(cycleTime - actualCycleTime);
-  }*/
+  }
 
 }
 

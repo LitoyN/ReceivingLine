@@ -30,8 +30,8 @@ const int relayPin = 10;
 const int holdBin = -1;
 const int emptyBin = 0;
 
-const int bin1 = 5; //index array of bin1 location
-const int bin2 = 2; //index array of bin2 location
+const int bin1 = 4; //index array of bin1 location
+const int bin2 = 7; //index array of bin2 location
 const int bin3 = 10; //index array of bin3 location
 const int encoderBeltIncrement = 80;
 const long cycleTime = 250;
@@ -51,6 +51,7 @@ int conveyorArraySize = 10;
 int conveyorArray[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int arrayIndex = 0;
 int currentBin;
+bool newBox = true;
 
 //conveyor driver
 AF_DCMotor bin1Actuator(1, MOTOR12_1KHZ);
@@ -58,14 +59,14 @@ AF_DCMotor bin2Actuator(3, MOTOR12_1KHZ);
 int actuatorSpeed = 100; //range from 0 to 255
 
 //sonar
-int sonarArraySize = 9;
-int rangevalue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+int sonarArraySize = 5;
+int rangevalue[] = {0, 0, 0, 0, 0};
 long pulse;
 int range;
 int minRange = 10;
 
 //serial
-int input;
+char input;
 
 void setup() {
   Serial.begin (9600);
@@ -99,8 +100,9 @@ void updateEncoder(){
 
   if(sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) encoderValue ++;
   if(sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) encoderValue --;
-Serial.println(encoderValue);//**********************
+  //Serial.println(encoderValue);//**********************
   lastEncoded = encoded; //store this value for next time
+  Serial.println(encoderValue);
   if(encoderValue >= encoderBeltIncrement){
     encoderValue = 0;
     incrementCounter++;
@@ -116,11 +118,16 @@ void sonarCheck(){
   }
   sortSonar(rangevalue,sonarArraySize);
   range = modeSonar(rangevalue,sonarArraySize);
-  if(range <= minRange){
+  if(range <= minRange && newBox){
     addToConveyorArray(holdBin);
-    currentBin = 8;
-    //currentBin = readAndSort();
+    //currentBin = 8;
+    currentBin = readAndSort();
     addToConveyorArray(currentBin);
+    newBox = false;
+  }
+  else if(range > minRange){
+    newBox = true;
+    
   }
 }
 
@@ -175,7 +182,7 @@ int modeSonar(int *x,int n){
 int readAndSort(){
   int sortToBin = 0;
   bool serialReceived = false;
-  Serial.print(1);
+  Serial.println('1');
   while(!serialReceived){
     sortToBin = checkSerial();
     if(sortToBin > -2){
@@ -199,11 +206,11 @@ void addToConveyorArray(int value) {
       }
     }
   }
-  for(int i = 0; i < 10; i++){
+  /**for(int i = 0; i < 10; i++){
     Serial.print(conveyorArray[i]);
     Serial.print(" ");
   }
-  Serial.println("");
+  Serial.println("");*/
 }
 
 void updateConveyorArray() {
@@ -214,13 +221,12 @@ void updateConveyorArray() {
       pushBox(i);
     }
   }
-  conveyorArray[0] = bin2;
-  //conveyorArray[0] = emptyBin;
-  for(int i = 0; i < 10; i++){
+  conveyorArray[0] = emptyBin;
+  /**for(int i = 0; i < 10; i++){
     Serial.print(conveyorArray[i]);
     Serial.print(" ");
   }
-  Serial.println("");
+  Serial.println("");*/
 }
 
 void microDelay(int x){
@@ -233,7 +239,7 @@ void pushBox(int binArrayIndex){
   int actuatorTime = 200;
   switch(binArrayIndex){
     case bin1:
-    Serial.println("pushing bin1");
+    //Serial.println("pushing bin1");
       bin1Actuator.run(FORWARD);
       microDelay(actuatorTime);
       bin1Actuator.run(BACKWARD);
@@ -241,7 +247,7 @@ void pushBox(int binArrayIndex){
       bin1Actuator.run(RELEASE);
       break;
     case bin2:
-    Serial.println("pushing bin2");
+    //Serial.println("pushing bin2");
       bin2Actuator.run(FORWARD);
       microDelay(actuatorTime);
       bin2Actuator.run(BACKWARD);
@@ -261,41 +267,21 @@ void loopUpdateArray(){
 }
 
 int checkSerial(){
+  
   if(Serial.available()>0){
     input=Serial.read();
-
   }
-
+  
   switch(input){
-    case 1:
-      //analogWrite(yPin, brightness);
-      //digitalWrite(rPin, LOW);
-      //digitalWrite(gPin, LOW);
+    case '1':
       return bin1;
       break;
-    case 2:
-      //analogWrite(rPin, brightness);
-      //digitalWrite(yPin, LOW);
-      //digitalWrite(gPin, LOW);
+    case '2':
       return bin2;
       break;
-    case 3:
-      //analogWrite(gPin, brightness);
-      //digitalWrite(yPin, LOW);
-      //digitalWrite(rPin, LOW);
+    case '3':
       return bin3;
       break;
-    /**case 4:
-      digitalWrite(yPin, LOW);
-      digitalWrite(rPin, LOW);
-      digitalWrite(gPin, LOW);
-      break;
-    case 5:
-      digitalWrite(relayPin, LOW);
-      digitalWrite(yPin, LOW);
-      digitalWrite(rPin, LOW);
-      digitalWrite(gPin, LOW);
-      break;*/
   }
   return -2;
 }
@@ -313,16 +299,16 @@ void checkButton(){
 
 void loop(){
   checkButton(); 
-  preCycleTime = millis();
+  //preCycleTime = millis();
   while(incrementCounter > 0){
     updateConveyorArray();
     incrementCounter--;
     sonarCheck();
   }
-  actualCycleTime = millis() - preCycleTime;
+  /**actualCycleTime = millis() - preCycleTime;
   if(actualCycleTime < cycleTime){
     delay(cycleTime - actualCycleTime);
-  }
+  }*/
 
 }
 

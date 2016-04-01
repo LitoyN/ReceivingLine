@@ -13,17 +13,19 @@
 #include <stdio.h>
 #include <conio.h>
 #include <windows.h>
-#include "tserial.h"
-#include "ardySerial.h"
-#include "bot_control.h"
+
+#include "SerialClass.h"
 
 
 using namespace std;
 
-serial comm2;
-ardySerial comm;
-char incoming;
-char lastIncoming;
+Serial* ardyComm;
+//serial comm2;
+char incoming[256] = "";
+char bin1 = '1';
+char bin2 = '2';
+char bin3 = '3';
+int dataLen = 255;
 char port[] = "\\\\.\\COM11";
 bool runProg = true;
 int binToSort = -2;
@@ -35,22 +37,56 @@ void readAndSort(){
 
 int main()
 {
+ 
+    ardyComm = new Serial("COM4");
+    //incoming = "2";
+    if(ardyComm->IsConnected()){
+        cout << "connected" << endl;
+
+    Sleep(1000);
     
-    incoming = '2';
-    comm2.startDevice(port,9600);
-    //comm.sendData(1);
-    Sleep(2000);
-    comm2.send_data('1');
+    ardyComm->WriteData(&bin1,1);
+    Sleep(10);
+    ardyComm->ReadData(incoming,dataLen);
+    if(*incoming == 'n')
+        cout << "read the incoming data as == 'n'" << endl;
+    else
+        cout << "did not read incoming data correctly as 'n'" << endl;
     cout << "on" << endl;
-    incoming = comm2.read_data();
-    cout << incoming << endl;
+    cout << "received: " << incoming << endl;
+    
     Sleep(2000);
-    comm2.send_data('0');
-    incoming = comm2.read_data();
-    cout << incoming << endl;
+    
+    ardyComm->WriteData(&bin2,1);
+    Sleep(10);
+    ardyComm->ReadData(incoming,dataLen);
+    if(*incoming == 'f')
+        cout << "read the incoming data as == 'f'" << endl;
+    else
+        cout << "did not read incoming data correctly as 'f'" << endl;
     cout << "off" << endl;
+    cout << "received: " << incoming << endl;
+
     Sleep(2000);
-    comm2.stopDevice();
+    
+    ardyComm->WriteData(&bin3,1);
+    Sleep(10);
+    ardyComm->ReadData(incoming,dataLen);
+    if(*incoming == 'b')
+        cout << "read the incoming data as == 'b'" << endl;
+    else
+        cout << "did not read incoming data correctly as 'b'" << endl;
+    cout << *incoming << endl;
+    cout << "blink" << endl;
+    cout << "received: " << incoming << endl;
+
+
+    Sleep(2000);
+
+    }
+    else
+        cout << "could not open com" << endl;
+    //comm2.stopDevice();
     
     return 0;
     

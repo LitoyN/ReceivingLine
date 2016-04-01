@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/SerialClass.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -12,6 +13,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/Serial.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -36,6 +38,7 @@
       </toolsSet>
       <compileType>
         <ccTool>
+          <commandlineTool>g++</commandlineTool>
           <incDir>
             <pElem>C:/OpenCV/opencv/build/include/opencv</pElem>
             <pElem>C:/OpenCV/opencv/build/include</pElem>
@@ -118,6 +121,16 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/Serial.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/SerialClass.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -221,6 +234,16 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/Serial.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/SerialClass.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>

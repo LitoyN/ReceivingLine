@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/95154549/ardySerial.o \
+	${OBJECTDIR}/_ext/95154549/Serial.o \
 	${OBJECTDIR}/_ext/95154549/tserial.o \
 	${OBJECTDIR}/main.o
 
@@ -64,10 +64,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ardyserialtest.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ardyserialtest ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/_ext/95154549/ardySerial.o: /C/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.cpp 
+${OBJECTDIR}/_ext/95154549/Serial.o: /C/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/Serial.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/95154549
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/95154549/ardySerial.o /C/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/95154549/Serial.o /C/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/Serial.cpp
 
 ${OBJECTDIR}/_ext/95154549/tserial.o: /C/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/tserial.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/95154549

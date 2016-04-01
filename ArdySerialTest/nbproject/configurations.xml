@@ -4,7 +4,9 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.h</itemPath>
+      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/SerialClass.h</itemPath>
+      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/bot_control.h</itemPath>
+      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/tserial.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -13,7 +15,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.cpp</itemPath>
+      <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/Serial.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
       <itemPath>C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/tserial.cpp</itemPath>
     </logicalFolder>
@@ -38,18 +40,18 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
-        <ccTool>
-          <incDir>
-            <pElem>C:/Users/elliot/Documents/GitHub/ReceivingLine/serial</pElem>
-          </incDir>
-        </ccTool>
       </compileType>
-      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.cpp"
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/Serial.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.h"
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/SerialClass.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/bot_control.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -57,6 +59,11 @@
       <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/tserial.cpp"
             ex="false"
             tool="1"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/tserial.h"
+            ex="false"
+            tool="3"
             flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
@@ -82,12 +89,17 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.cpp"
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/Serial.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/ardySerial.h"
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/SerialClass.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/bot_control.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -95,6 +107,11 @@
       <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/tserial.cpp"
             ex="false"
             tool="1"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/elliot/Documents/GitHub/ReceivingLine/ArdySerialTest/tserial.h"
+            ex="false"
+            tool="3"
             flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">

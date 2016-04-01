@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/2047371302/Serial.o \
 	${OBJECTDIR}/main.o
 
 
@@ -61,6 +62,11 @@ LDLIBSOPTIONS=-L/C/OpenCV/opencv/release/lib -lopencv_calib3d249.dll -lopencv_ca
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/camera_scan_system_v1.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/camera_scan_system_v1 ${OBJECTFILES} ${LDLIBSOPTIONS}
+
+${OBJECTDIR}/_ext/2047371302/Serial.o: /C/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/Serial.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/2047371302
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I/C/OpenCV/opencv/build/include/opencv -I/C/OpenCV/opencv/build/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2047371302/Serial.o /C/Users/elliot/Documents/GitHub/ReceivingLine/Camera_Scan_System_v1/Serial.cpp
 
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
