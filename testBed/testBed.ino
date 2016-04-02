@@ -326,21 +326,9 @@ void checkButton(){
 }
 
 void loop(){
-  checkButton();
-  if(oldPositionExternal != positionExternal){
-    Serial.println(positionExternal);
-  }
-  oldPositionExternal = positionExternal;
-  //updateConveyorArray(); 
-  //preCycleTime = millis();
-  while(incrementCounter > 0){
-    Serial.print("incrementCounter: ");
-    Serial.println(incrementCounter);
-    updateConveyorArray();
-    incrementCounter--;
-    Serial.println(incrementCounter);
-    //sonarCheck();
-  }
+  delay(2000);
+  pushBox(bin1);
+  delay(2000);
   /**actualCycleTime = millis() - preCycleTime;
   if(actualCycleTime < cycleTime){
     delay(cycleTime - actualCycleTime);

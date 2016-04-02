@@ -37,7 +37,7 @@ string annLocation = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn
 string labels[16] = {"A", "B", "C", "D", "E", "F", "G", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
 Serial* ardyComm; 
-char port[] = "COM4";
+char port[] = "COM5";
 char incoming[256] ="";
 int dataLen = 255;
 char bin1 = '1';

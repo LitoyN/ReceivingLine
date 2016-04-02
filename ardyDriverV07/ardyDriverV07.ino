@@ -31,7 +31,7 @@ const int emptyBin = 0;
 const int bin1 = 4; //index array of bin1 location
 const int bin2 = 7; //index array of bin2 location
 const int bin3 = 10; //index array of bin3 location
-const long cycleTime = 250;
+const long cycleTime = 500;
 
 
 
