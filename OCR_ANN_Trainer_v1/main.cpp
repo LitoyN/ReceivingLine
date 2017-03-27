@@ -20,30 +20,31 @@
 
 using namespace cv;
 using namespace std;
-#define CLASScount 7
-#define TESTCLASScount 7
+#define CLASScount 6
+#define TESTCLASScount 6
 
 int attributeCount = 300; //dictionary size
-int trainFileCounts = 70;    
-int testFileCounts = 30;
+int trainFileCounts = 100;    
+int testFileCounts = 90;
+int numClassToUse = 6;
 int totalTrainFileCount = trainFileCounts * CLASScount; //total number of training files
 int totalTestFileCount = testFileCounts * TESTCLASScount; //total number of test files
-string dictionaryFileName = "dictionary04.yml";
-string toSaveANNFile = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn08.xml";
+string dictionaryFileName = "dictionary07.yml";
+string toSaveANNFile = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn27.xml";
 
 int main(int argc, char** argv) {
     string labels[16] = {"A", "B", "C", "D", "E", "F", "G", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
-    string trainDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\Crop\\TrainingDir\\";
-    string testDirPath = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\OCR_Make_Sift_Dictionary_v1\\Crop\\TestDir\\";
+    string trainDirPath = "C:\\Users\\elliot\\Google Drive\\UNCA 15-16\\Receiving Line\\Training2\\";
+    string testDirPath = "C:\\Users\\elliot\\Google Drive\\UNCA 15-16\\Receiving Line\\Training2\\";
     string filenameTemplates[16] = {
-        "Letters\\A\\A%03d.jpg", //%.03d is like printf
-        "Letters\\B\\B%03d.jpg",
-        "Letters\\C\\C%03d.jpg",
-        "Letters\\D\\D%03d.jpg",
-        "Letters\\E\\E%03d.jpg",
-        "Letters\\F\\F%03d.jpg",
-        "Letters\\G\\G%03d.jpg",
+        "A\\A%03d.jpg", //%.03d is like printf
+        "B\\B%03d.jpg",
+        "C\\C%03d.jpg",
+        "D\\D%03d.jpg",
+        "E\\E%03d.jpg",
+        //"\\F\\F%03d.jpg",
+        "G\\G%03d.jpg",
         "Nums\\1\\1%03d.jpg",
         "Nums\\2\\2%03d.jpg",
         "Nums\\3\\3%03d.jpg",
@@ -89,16 +90,16 @@ int main(int argc, char** argv) {
     bowDE.setVocabulary(dictionary);
 
     int realImageNumber = -1;
-    for (int classification = 0; classification < CLASScount; classification++) {
+    for (int classification = 0; classification < numClassToUse; classification++) {
         for (int imageNumber = 1; imageNumber <= trainFileCounts; imageNumber++) {
             realImageNumber++;
             string tempName = trainDirPath + filenameTemplates[classification];
             sprintf(filename, tempName.c_str(), imageNumber);
             cout << "file name = " << filename << endl;
             currentImage = imread(filename, CV_LOAD_IMAGE_GRAYSCALE); //Load as grayscale                
-            cout << "image read" << endl;
+            //cout << "image read" << endl;
             detector->detect(currentImage, keypoints); //detect feature points
-            cout << "keypoints detected" << endl;
+            //cout << "keypoints detected" << endl;
             Mat bowDescriptor2; //To store the BoW (or BoF) representation of the image
             //extract BoW (or BoF) descriptor from given image
             bowDE.compute(currentImage, keypoints, bowDescriptor2); //compute the descriptors for each keypoint
@@ -109,7 +110,7 @@ int main(int argc, char** argv) {
     }//for each test classification
     cout << "zaboomafoo" << endl;
     realImageNumber = -1;
-    for (int classification = 0; classification < TESTCLASScount; classification++) {
+    for (int classification = 0; classification < numClassToUse; classification++) {
         for (int imageNumber = trainFileCounts + 1; imageNumber < trainFileCounts+1+testFileCounts; imageNumber++) {
             cout << "image number: " << imageNumber << endl;
             realImageNumber++;
@@ -119,10 +120,10 @@ int main(int argc, char** argv) {
             sprintf(filename, tempName.c_str(), imageNumber);
             cout << "file name = " << filename << endl;
             currentImage = imread(filename, CV_LOAD_IMAGE_GRAYSCALE); //Load as grayscale                
-            cout << "image loaded" << endl;
+            //cout << "image loaded" << endl;
             //detect feature points
             detector->detect(currentImage, keypoints);
-            cout << "keypoints detected" << endl;
+            //cout << "keypoints detected" << endl;
             //compute the descriptors for each keypoint
             //To store the BoW (or BoF) representation of the image
             Mat bowDescriptor2;
@@ -156,7 +157,7 @@ int main(int argc, char** argv) {
     cv::Mat layers(3, 1, CV_32S);
     layers.at<int>(0, 0) = attributeCount; //input layer
     layers.at<int>(1, 0) = 80; //hidden layer
-    layers.at<int>(2, 0) = CLASScount; //output layer
+    layers.at<int>(2, 0) = numClassToUse; //output layer
 
     cout << "building ann" << endl;
     //create the neural network.
@@ -224,7 +225,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        printf("Testing Sample %i -> class result: %d (%s)\n", tsample, maxIndex, labels[maxIndex].c_str());
+        //printf("Testing Sample %i -> class result: %d (%s)\n", tsample, maxIndex, labels[maxIndex].c_str());
 
         //Now compare the predicted class to the actural class. if the prediction is correct then\
             //test_set_classifications[tsample][ maxIndex] should be 1.

@@ -15,24 +15,25 @@
 
 using namespace cv;
 using namespace std;
-#define CLASScount 16
+#define CLASScount 15
 
 int main(int argc, char** argv) {
 
-    string labels[CLASScount] = {"A", "B", "C", "D", "E", "F", "G",
+    string labels[CLASScount] = {"A", "B", "C", "D", "E", "G",
     "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     //the number of words
     int dictionarySize = 300;
-    string toSaveDictionary = "dictionary04.yml";
+    string toSaveDictionary = "dictionary22.yml";
+    string fileDir = "C:\\Users\\elliot\\Google Drive\\UNCA 15-16\\Receiving Line\\Training2\\";
     string filenameTemplates[CLASScount] = {
-        "TemplateDir\\Letters\\A\\A%03d.jpg", //%.03d is like printf
-        "TemplateDir\\Letters\\B\\B%03d.jpg",
-        "TemplateDir\\Letters\\C\\C%03d.jpg",
-        "TemplateDir\\Letters\\D\\D%03d.jpg",
-        "TemplateDir\\Letters\\E\\E%03d.jpg",
-        "TemplateDir\\Letters\\F\\F%03d.jpg",
-        "TemplateDir\\Letters\\G\\G%03d.jpg",
+        "A\\A%03d.jpg", //%.03d is like printf
+        "B\\B%03d.jpg",
+        "C\\C%03d.jpg",
+        "D\\D%03d.jpg",
+        "E\\E%03d.jpg",
+        //"TemplateDir\\Letters\\F\\F%03d.jpg",
+        "G\\G%03d.jpg",
         "TemplateDir\\Nums\\1\\1%03d.jpg",
         "TemplateDir\\Nums\\2\\2%03d.jpg",
         "TemplateDir\\Nums\\3\\3%03d.jpg",
@@ -43,7 +44,8 @@ int main(int argc, char** argv) {
         "TemplateDir\\Nums\\8\\8%03d.jpg",
         "TemplateDir\\Nums\\9\\9%03d.jpg"
     };
-    int fileCounts = 1;
+    int numClassForTraining = 6;
+    int fileCounts = 100;
     //int fileCounts[] = {50, 50, 50, 50, 50};  //using 40 training images
 
     char *filename = new char[100];
@@ -56,9 +58,10 @@ int main(int argc, char** argv) {
     //The SIFT feature extractor and descriptor
     SiftDescriptorExtractor detector;  //SIFT descriptor will give 128 values. descriptor represents region around the keypoint which is 16 x 16. 8 values representing gradient direction in each cell of 4 x 4 subgrid.
 
-    for (int classification = 0; classification < CLASScount; classification++) {
-        for (int imageNumber = 1; imageNumber <= fileCounts; imageNumber++) {
-            sprintf(filename, filenameTemplates[classification].c_str(), imageNumber);
+    for (int classification = 0; classification < numClassForTraining; classification++) {
+        for (int imageNumber = 0; imageNumber <= fileCounts; imageNumber++) {
+            string tempName = fileDir + filenameTemplates[classification];
+            sprintf(filename, tempName.c_str(), imageNumber);
             cout << "file name = "  << filename << endl;
             currentImage = imread(filename, CV_LOAD_IMAGE_GRAYSCALE); //Load as grayscale                
             cout << "image loaded" << endl;

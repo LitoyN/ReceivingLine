@@ -18,11 +18,10 @@
 
 using namespace cv;
 using namespace std;
-#define CLASScount 7
+#define CLASScount 6
 
 //CV variables
 Mat frame_hsv, frame;
-int imageNumber = 0;
 int attributeCount = 300;
 int testFileCounts = 30;
 int totalTestFileCount = testFileCounts * CLASScount;
@@ -32,9 +31,11 @@ char *filename = new char[200];
 Mat currentImage;
 CvANN_MLP *nnetwork;
 Mat dictionary;
-FileStorage dictionaryFile("dictionary04.yml", FileStorage::READ);
-string annLocation = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn07.xml";
+FileStorage dictionaryFile("dictionary10.yml", FileStorage::READ);
+string fileDirName = "C:\\Users\\elliot\\Google Drive\\UNCA 15-16\\Receiving Line\\Video4\\%03d.jpg";
+string annLocation = "C:\\Users\\elliot\\Documents\\GitHub\\ReceivingLine\\cvAnn11.xml";
 string labels[16] = {"A", "B", "C", "D", "E", "F", "G", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+int imageNumber;
 
 Serial* ardyComm; 
 char port[] = "COM5";
@@ -43,6 +44,7 @@ int dataLen = 255;
 char bin1 = '1';
 char bin2 = '2';
 char bin3 = '3';
+char binFlush = '0';
 
 void sortToBin(int index){
     cout << endl << "sorting to bin: " << index << endl;
@@ -102,7 +104,7 @@ void annClassify(){
     nnetwork->predict(features.row(imageNumber), classificationResult); //ANN makes a classification for the current test image
 
     cout << "imageNumber: " << imageNumber << endl;
-    cout << "prediction made" << endl;
+    //cout << "prediction made" << endl;
     int maxIndex = 0;
     float value = 0.0f;
     float maxValue = classificationResult.at<float>(0, 0);
@@ -116,11 +118,14 @@ void annClassify(){
 
         }
     }
-    
+    cout << endl;
+    cout << "ANN Classification for Current Image: " << labels[maxIndex].c_str() << endl;
+        //printf("ANN Classification for Current Image: %s \n", labels[maxIndex].c_str());
     sortToBin(maxIndex);
+    ardyComm->WriteData(&binFlush,1);
     cout << endl;
     //cout << "end maxValue: " << maxValue << endl;
-    printf("ANN Classification for Current Image: %s \n", labels[maxIndex].c_str());
+
 }
 
 void annLoad(){
@@ -137,6 +142,7 @@ int main(int argc, char** argv) {
     dictionaryFile["vocabulary"] >> dictionary; //puts the features from the dictionary into the dictionary matrix
     dictionaryFile.release();
     VideoCapture cam(1);
+    imageNumber = 0;
 
     
     if(!cam.isOpened()){
@@ -156,6 +162,8 @@ int main(int argc, char** argv) {
             cout << "taking picture" << endl;
             namedWindow("Current Image");
             imshow("Current Image", currentImage);
+            sprintf(filename, fileDirName.c_str(), imageNumber);
+            imwrite(filename, currentImage);
             detectFeatures();
             annClassify();
             incoming[0] = '0';

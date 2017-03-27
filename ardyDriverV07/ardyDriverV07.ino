@@ -1,9 +1,6 @@
 //serial handling
 //https://github.com/abdurrahmanbmf/Serial-Communication/
 
-//encoder handling
-//From bildr article: http://bildr.org/2012/08/rotary-encoder-arduino/
-
 //sonar handling
 //Lessels, Jason (2011/June/06), Allen, Bruce (2009/July/23) and Gentles, Bill (2010/Nov/12)
 //http://playground.arduino.cc/Main/MaxSonar
